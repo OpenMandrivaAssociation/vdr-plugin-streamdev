@@ -3,22 +3,22 @@
 %define name	vdr-plugin-%plugin
 %define version	0.3.3
 %define cvsrev	20%shortrev
-%define shortrev	070205
+%define shortrev	070420
 %define rel	1
-%define release	1.%shortrev.%rel
+%define release	%mkrel 1.%shortrev.%rel
 
 Summary:	VDR plugin: streamdev
 Name:		%name
 Version:	%version
-Release:	%mkrel %release
+Release:	%release
 Group:		Video
 License:	GPL
 URL:		http://www.magoa.net/linux/
 
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
 Source:		vdr-%plugin-%cvsrev.tar.bz2
-Source1:	http://phivdr.dyndns.org/vdr/vdr-streamdev-patches/testing/README
-Patch0:		http://phivdr.dyndns.org/vdr/vdr-streamdev-patches/testing/vdr-streamdev-CVS-20070409_ts-streaming_add-pat-and-pmt-0.5.patch
+Source1:	http://phivdr.dyndns.org/vdr/vdr-streamdev-patches/README
+Patch0:		http://phivdr.dyndns.org/vdr/vdr-streamdev-patches/section_filters-0.5.patch
 
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.4.1-6
@@ -63,7 +63,7 @@ installation without any DVB-Hardware including EPG-Handling.
 %setup -q -n %plugin
 %patch0 -p0
 
-cp %SOURCE1 README.pat_pmt
+cp %SOURCE1 README.patch
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
