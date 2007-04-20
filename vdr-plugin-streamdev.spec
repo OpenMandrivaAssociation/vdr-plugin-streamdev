@@ -17,7 +17,8 @@ URL:		http://www.magoa.net/linux/
 
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
 Source:		vdr-%plugin-%cvsrev.tar.bz2
-Patch2:		vdr-streamdev-cvs-20060823-dvbsubtitles.diff
+Source1:	http://phivdr.dyndns.org/vdr/vdr-streamdev-patches/testing/README
+Patch0:		http://phivdr.dyndns.org/vdr/vdr-streamdev-patches/testing/vdr-streamdev-CVS-20070409_ts-streaming_add-pat-and-pmt-0.5.patch
 
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.4.1-6
@@ -60,7 +61,9 @@ installation without any DVB-Hardware including EPG-Handling.
 
 %prep
 %setup -q -n %plugin
-%patch2 -p0
+%patch0 -p0
+
+cp %SOURCE1 README.pat_pmt
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
@@ -95,11 +98,11 @@ rm -rf %{buildroot}
 
 %files server -f streamdev-server.vdr
 %defattr(-,root,root)
-%doc README HISTORY CONTRIBUTORS PROTOCOL
+%doc README* HISTORY CONTRIBUTORS PROTOCOL
 %config(noreplace) %{_vdr_plugin_cfgdir}/streamdevhosts.conf
 
 %files client -f streamdev-client.vdr
 %defattr(-,root,root)
-%doc README HISTORY CONTRIBUTORS
+%doc README* HISTORY CONTRIBUTORS
 
 
