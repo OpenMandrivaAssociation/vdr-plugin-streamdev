@@ -18,6 +18,9 @@ URL:		http://streamdev.vdr-developer.org/
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
 Source:		vdr-%plugin-%cvsrev.tar.bz2
 
+# Use TS instead of PES for HTTP streaming by default for better
+# client compatibility
+Patch0:		streamdev-TS-default.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.4.1-6
 
@@ -59,6 +62,7 @@ installation without any DVB-Hardware including EPG-Handling.
 
 %prep
 %setup -q -n %plugin
+%patch0 -p1
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
