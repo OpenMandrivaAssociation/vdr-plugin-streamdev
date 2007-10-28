@@ -3,8 +3,8 @@
 %define name	vdr-plugin-%plugin
 %define version	0.3.3
 %define cvsrev	20%shortrev
-%define shortrev	070611
-%define rel	4
+%define shortrev	071028
+%define rel	1
 %define release	%mkrel 1.%shortrev.%rel
 
 Summary:	VDR plugin: streamdev
@@ -13,7 +13,7 @@ Version:	%version
 Release:	%release
 Group:		Video
 License:	GPL
-URL:		http://www.magoa.net/linux/
+URL:		http://streamdev.vdr-developer.org/
 
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
 Source:		vdr-%plugin-%cvsrev.tar.bz2
@@ -64,6 +64,12 @@ perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
 
 sed -i 's,STREAMERBUFSIZE MEGABYTE(4),STREAMERBUFSIZE MEGABYTE(16),' server/streamer.h
+
+%vdr_plugin_params_begin %plugin-server
+# define an external command for remuxing
+var=REMUXER
+param=--remux=REMUXER
+%vdr_plugin_params_end
 
 %build
 %vdr_plugin_build
