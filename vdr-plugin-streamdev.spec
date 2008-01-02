@@ -21,6 +21,7 @@ Source:		vdr-%plugin-%cvsrev.tar.bz2
 # Use TS instead of PES for HTTP streaming by default for better
 # client compatibility
 Patch0:		streamdev-TS-default.patch
+BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.4.1-6
 
 %description
