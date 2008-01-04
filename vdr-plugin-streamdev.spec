@@ -4,7 +4,7 @@
 %define version	0.3.3
 %define cvsrev	20%shortrev
 %define shortrev	071028
-%define rel	2
+%define rel	3
 %define release	%mkrel 1.%shortrev.%rel
 
 Summary:	VDR plugin: streamdev
