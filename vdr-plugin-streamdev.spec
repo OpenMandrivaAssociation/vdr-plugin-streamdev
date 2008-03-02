@@ -3,8 +3,8 @@
 %define name	vdr-plugin-%plugin
 %define version	0.3.3
 %define cvsrev	20%shortrev
-%define shortrev	071028
-%define rel	3
+%define shortrev	080302
+%define rel	1
 %define release	%mkrel 1.%shortrev.%rel
 
 Summary:	VDR plugin: streamdev
