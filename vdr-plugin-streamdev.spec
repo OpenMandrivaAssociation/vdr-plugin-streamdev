@@ -1,11 +1,15 @@
 
 %define plugin	streamdev
 %define name	vdr-plugin-%plugin
-%define version	0.3.3
-%define cvsrev	20%shortrev
-%define shortrev	080302
+%define version	0.3.4
+%define cvsrev	20080425
 %define rel	1
-%define release	%mkrel 1.%shortrev.%rel
+
+%if %cvsrev
+%define release	%mkrel 1.%cvsrev.%rel
+%else
+%define release	%mkrel %rel
+%endif
 
 Summary:	VDR plugin: streamdev
 Name:		%name
@@ -15,14 +19,19 @@ Group:		Video
 License:	GPL
 URL:		http://streamdev.vdr-developer.org/
 
+%if %cvsrev
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
 Source:		vdr-%plugin-%cvsrev.tar.bz2
+%else
+Source:		vdr-%plugin-%version.tgz
+%endif
 
 # Use TS instead of PES for HTTP streaming by default for better
 # client compatibility
 Patch0:		streamdev-TS-default.patch
+Patch1:		streamdev-fix-non-threadsafe-configdir-call.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
-BuildRequires:	vdr-devel >= 1.4.1-6
+BuildRequires:	vdr-devel >= 1.6.0
 
 %description
 This PlugIn is a VDR implementation of the VTP (Video Transfer Protocol,
@@ -35,6 +44,8 @@ with the PlugIn source, but appear as separate PlugIns to VDR.
 Summary:	VDR plugin: VDR Streaming Server
 Group:		Video
 Requires:	vdr-abi = %vdr_abi
+Requires:	%plugin-common >= %version-%release
+Requires(post):	%plugin-common >= %version-%release
 
 %description server
 This PlugIn is a VDR implementation of the VTP (Video Transfer Protocol,
@@ -51,6 +62,8 @@ WinAMP, you can also listen to radio channels over a HTTP connection.
 Summary:	VDR plugin: VTP Streaming Client
 Group:		Video
 Requires:	vdr-abi = %vdr_abi
+Requires:	%plugin-common >= %version-%release
+Requires(post):	%plugin-common >= %version-%release
 
 %description client
 This PlugIn is a VDR implementation of the VTP (Video Transfer Protocol,
@@ -60,20 +73,41 @@ The client part acts as a full Input Device, so it can be used in conjunction
 with a DXR3-Card, XINE, SoftDevice or others to act as a working VDR
 installation without any DVB-Hardware including EPG-Handling.
 
+%package -n %plugin-common
+Summary:	Streamdev translation files
+Group:		Video
+
+%description -n %plugin-common
+Streamdev translation files.
+
 %prep
+%if %cvsrev
 %setup -q -n %plugin
+find -type d -name CVS -print0 | xargs -0 rm -rf
+%else
+%setup -q -n %plugin-%version
+%endif
 %patch0 -p1
+%patch1 -p1
+%vdr_plugin_prep
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
 
-sed -i 's,STREAMERBUFSIZE MEGABYTE(4),STREAMERBUFSIZE MEGABYTE(16),' server/streamer.h
+# (Anssi 04/2008) Was needed in distant past with some connections, trying without now:
+#sed -i 's,STREAMERBUFSIZE MEGABYTE(4),STREAMERBUFSIZE MEGABYTE(16),' server/streamer.h
 
 %vdr_plugin_params_begin %plugin-server
 # define an external command for remuxing
 var=REMUXER
 param=--remux=REMUXER
 %vdr_plugin_params_end
+
+cat > README.0.3.4.upgrade.urpmi <<EOF
+The config file location of streamdev has changed. In the default hierarchy,
+this means that the files have been moved from /var/lib/vdr/config/plugins
+to /var/lib/vdr/config/plugins/streamdev.
+EOF
 
 %build
 %vdr_plugin_build
@@ -83,8 +117,11 @@ rm -rf %{buildroot}
 
 %vdr_plugin_install
 
-install -d -m755 %{buildroot}%{_vdr_plugin_cfgdir}
-install -m644 streamdevhosts.conf.example 	%{buildroot}%{_vdr_plugin_cfgdir}/streamdevhosts.conf
+install -d -m755 %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
+install -m766 %plugin/externremux.sh %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
+install -m644 %plugin/streamdevhosts.conf %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
+
+%find_lang vdr-%plugin
 
 %clean
 rm -rf %{buildroot}
@@ -103,11 +140,14 @@ rm -rf %{buildroot}
 
 %files server -f streamdev-server.vdr
 %defattr(-,root,root)
-%doc README* HISTORY CONTRIBUTORS PROTOCOL
-%config(noreplace) %{_vdr_plugin_cfgdir}/streamdevhosts.conf
+%doc README HISTORY CONTRIBUTORS PROTOCOL README.0.3.4.upgrade.urpmi
+%dir %{_vdr_plugin_cfgdir}/%plugin
+%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin/streamdevhosts.conf
+%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin/externremux.sh
 
 %files client -f streamdev-client.vdr
 %defattr(-,root,root)
-%doc README* HISTORY CONTRIBUTORS
+%doc README HISTORY CONTRIBUTORS
 
-
+%files -n %plugin-common -f vdr-streamdev.lang
+%defattr(-,root,root)
