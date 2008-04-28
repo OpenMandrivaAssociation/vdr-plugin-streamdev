@@ -3,7 +3,7 @@
 %define name	vdr-plugin-%plugin
 %define version	0.3.4
 %define cvsrev	20080425
-%define rel	1
+%define rel	2
 
 %if %cvsrev
 %define release	%mkrel 1.%cvsrev.%rel
@@ -29,7 +29,8 @@ Source:		vdr-%plugin-%version.tgz
 # Use TS instead of PES for HTTP streaming by default for better
 # client compatibility
 Patch0:		streamdev-TS-default.patch
-Patch1:		streamdev-fix-non-threadsafe-configdir-call.patch
+Patch1:		remuxpath.diff
+Patch2:		streamdev-intcam.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.6.0
 
@@ -88,7 +89,8 @@ find -type d -name CVS -print0 | xargs -0 rm -rf
 %setup -q -n %plugin-%version
 %endif
 %patch0 -p1
-%patch1 -p1
+%patch1 -p0
+%patch2 -p1
 %vdr_plugin_prep
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
