@@ -3,7 +3,7 @@
 %define name	vdr-plugin-%plugin
 %define version	0.3.4
 %define cvsrev	20080425
-%define rel	2
+%define rel	3
 
 %if %cvsrev
 %define release	%mkrel 1.%cvsrev.%rel
@@ -120,7 +120,7 @@ rm -rf %{buildroot}
 %vdr_plugin_install
 
 install -d -m755 %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
-install -m766 %plugin/externremux.sh %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
+install -m755 %plugin/externremux.sh %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
 install -m644 %plugin/streamdevhosts.conf %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
 
 %find_lang vdr-%plugin
