@@ -31,6 +31,7 @@ Source:		vdr-%plugin-%version.tgz
 Patch0:		streamdev-TS-default.patch
 Patch1:		remuxpath.diff
 Patch2:		streamdev-intcam.patch
+Patch3:		streamdev-format-string.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.6.0
 
@@ -91,6 +92,7 @@ find -type d -name CVS -print0 | xargs -0 rm -rf
 %patch0 -p1
 %patch1 -p0
 %patch2 -p1
+%patch3 -p1
 %vdr_plugin_prep
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
