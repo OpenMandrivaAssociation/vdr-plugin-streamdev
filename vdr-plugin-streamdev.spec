@@ -2,8 +2,8 @@
 %define plugin	streamdev
 %define name	vdr-plugin-%plugin
 %define version	0.3.4
-%define cvsrev	20080425
-%define rel	4
+%define cvsrev	20090715
+%define rel	1
 
 %if %cvsrev
 %define release	%mkrel 1.%cvsrev.%rel
@@ -21,17 +21,12 @@ URL:		http://streamdev.vdr-developer.org/
 
 %if %cvsrev
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
-Source:		vdr-%plugin-%cvsrev.tar.bz2
+Source:		vdr-%plugin-%cvsrev.tar.xz
 %else
 Source:		vdr-%plugin-%version.tgz
 %endif
 
-# Use TS instead of PES for HTTP streaming by default for better
-# client compatibility
-Patch0:		streamdev-TS-default.patch
-Patch1:		remuxpath.diff
-Patch2:		streamdev-intcam.patch
-Patch3:		streamdev-format-string.patch
+Patch1:		streamdev-format-string.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.6.0
 
@@ -89,20 +84,20 @@ find -type d -name CVS -print0 | xargs -0 rm -rf
 %else
 %setup -q -n %plugin-%version
 %endif
-%patch0 -p1
 %patch1 -p0
-%patch2 -p1
-%patch3 -p1
 %vdr_plugin_prep
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
 
-# (Anssi 04/2008) Was needed in distant past with some connections, trying without now:
-#sed -i 's,STREAMERBUFSIZE MEGABYTE(4),STREAMERBUFSIZE MEGABYTE(16),' server/streamer.h
-
 %vdr_plugin_params_begin %plugin-server
-# define an external command for remuxing
+# Credentials for HTTP authentication, in format "LOGIN:PASSWORD".
+# Credentials are required when connecting from a host not listed in
+# streamdevhosts.conf. The default (i.e. no credentials set below) is to
+# not allow connection from such hosts at all.
+var=AUTH
+param=--auth=AUTH
+# Define an external command for remuxing
 var=REMUXER
 param=--remux=REMUXER
 %vdr_plugin_params_end
