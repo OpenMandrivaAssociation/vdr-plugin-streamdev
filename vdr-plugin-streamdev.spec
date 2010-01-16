@@ -1,12 +1,12 @@
 
 %define plugin	streamdev
 %define name	vdr-plugin-%plugin
-%define version	0.3.4
-%define cvsrev	20090715
-%define rel	2
+%define version	0.5.0
+%define cvsrev	20100116
+%define rel	1
 
 %if %cvsrev
-%define release	%mkrel 1.%cvsrev.%rel
+%define release	%mkrel 0.pre.%cvsrev.%rel
 %else
 %define release	%mkrel %rel
 %endif
@@ -26,7 +26,6 @@ Source:		vdr-%plugin-%cvsrev.tar.xz
 Source:		vdr-%plugin-%version.tgz
 %endif
 
-Patch1:		streamdev-format-string.patch
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.6.0
 
@@ -84,7 +83,6 @@ find -type d -name CVS -print0 | xargs -0 rm -rf
 %else
 %setup -q -n %plugin-%version
 %endif
-%patch1 -p0
 %vdr_plugin_prep
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
