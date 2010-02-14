@@ -2,7 +2,7 @@
 %define plugin	streamdev
 %define name	vdr-plugin-%plugin
 %define version	0.5.0
-%define cvsrev	20100116
+%define cvsrev	20100214
 %define rel	1
 
 %if %cvsrev
@@ -25,6 +25,11 @@ Source:		vdr-%plugin-%cvsrev.tar.xz
 %else
 Source:		vdr-%plugin-%version.tgz
 %endif
+
+# From XBMC
+Patch0:		streamdev-cvs100210-ReplaceRecordingStreaming.patch
+Patch1:		streamdev-cvs221109-AddCallbackMsg.diff
+Patch2:		streamdev-cvs221109-AddFemonV1.diff
 
 BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.6.0
@@ -83,6 +88,9 @@ find -type d -name CVS -print0 | xargs -0 rm -rf
 %else
 %setup -q -n %plugin-%version
 %endif
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
 %vdr_plugin_prep
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
