@@ -2,7 +2,7 @@
 %define plugin	streamdev
 %define name	vdr-plugin-%plugin
 %define version	0.5.0
-%define cvsrev	20100214
+%define cvsrev	0
 %define rel	1
 
 %if %cvsrev
@@ -23,7 +23,7 @@ URL:		http://streamdev.vdr-developer.org/
 # From streamdev @ :pserver:anoncvs@vdr-developer.org:/var/cvsroot
 Source:		vdr-%plugin-%cvsrev.tar.xz
 %else
-Source:		vdr-%plugin-%version.tgz
+Source:		http://streamdev.vdr-developer.org/releases/vdr-%plugin-%version.tgz
 %endif
 
 # From XBMC
@@ -74,13 +74,6 @@ The client part acts as a full Input Device, so it can be used in conjunction
 with a DXR3-Card, XINE, SoftDevice or others to act as a working VDR
 installation without any DVB-Hardware including EPG-Handling.
 
-%package -n %plugin-common
-Summary:	Streamdev translation files
-Group:		Video
-
-%description -n %plugin-common
-Streamdev translation files.
-
 %prep
 %if %cvsrev
 %setup -q -n %plugin
@@ -91,7 +84,11 @@ find -type d -name CVS -print0 | xargs -0 rm -rf
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+cd server
 %vdr_plugin_prep
+cd ../client
+%vdr_plugin_prep
+cd ..
 
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
@@ -108,10 +105,14 @@ var=REMUXER
 param=--remux=REMUXER
 %vdr_plugin_params_end
 
-cat > README.0.3.4.upgrade.urpmi <<EOF
-The config file location of streamdev has changed. In the default hierarchy,
-this means that the files have been moved from /var/lib/vdr/config/plugins
-to /var/lib/vdr/config/plugins/streamdev.
+cat > README.0.5.0-1.upgrade.urpmi <<EOF
+The config file location of streamdev has changed from
+/var/lib/vdr/config/plugins/streamdev
+to
+/var/lib/vdr/config/plugins/streamdev-server.
+streamdevhosts.conf has been automatically moved unless there was a conflict.
+externremux.sh is not moved automatically as there has been a slight change
+in the syntax (it has to provide HTTP headers).
 EOF
 
 %build
@@ -119,19 +120,30 @@ EOF
 
 %install
 rm -rf %{buildroot}
-
+cd server
 %vdr_plugin_install
+cd ../client
+%vdr_plugin_install
+cd ..
 
-install -d -m755 %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
-install -m755 %plugin/externremux.sh %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
-install -m644 %plugin/streamdevhosts.conf %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}
-
-%find_lang vdr-%plugin
+install -d -m755 %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}-server
+install -m755 %plugin-server/externremux.sh %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}-server
+install -m644 %plugin-server/streamdevhosts.conf %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}-server
 
 %clean
 rm -rf %{buildroot}
 
+%pre server
+if [ $1 = 2 ] && ! [ -e %{_vdr_plugin_cfgdir}/%{plugin}-server ] && [ -e %{_vdr_plugin_cfgdir}/%{plugin} ]; then
+	mkdir -p %{_vdr_plugin_cfgdir}/%{plugin}-server
+	touch %{_vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
+fi
+
 %post server
+if [ $1 = 2 ] && [ -e %{_vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration ]; then
+	mv -vf %{_vdr_plugin_cfgdir}/%{plugin}/streamdevhosts.conf %{_vdr_plugin_cfgdir}/%{plugin}-server/streamdevhosts.conf
+	rm -f %{_vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
+fi
 %vdr_plugin_post %plugin-server
 
 %postun server
@@ -143,16 +155,13 @@ rm -rf %{buildroot}
 %postun client
 %vdr_plugin_postun %plugin-client
 
-%files server -f streamdev-server.vdr
+%files server -f server/streamdev-server.vdr
 %defattr(-,root,root)
-%doc README HISTORY CONTRIBUTORS PROTOCOL README.0.3.4.upgrade.urpmi
-%dir %{_vdr_plugin_cfgdir}/%plugin
-%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin/streamdevhosts.conf
-%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin/externremux.sh
+%doc README HISTORY CONTRIBUTORS PROTOCOL README.*.upgrade.urpmi
+%dir %{_vdr_plugin_cfgdir}/%plugin-server
+%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin-server/streamdevhosts.conf
+%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin-server/externremux.sh
 
-%files client -f streamdev-client.vdr
+%files client -f client/streamdev-client.vdr
 %defattr(-,root,root)
 %doc README HISTORY CONTRIBUTORS
-
-%files -n %plugin-common -f vdr-streamdev.lang
-%defattr(-,root,root)
