@@ -3,7 +3,7 @@
 %define name	vdr-plugin-%plugin
 %define version	0.5.0
 %define cvsrev	0
-%define rel	1
+%define rel	2
 
 %if %cvsrev
 %define release	%mkrel 0.pre.%cvsrev.%rel
