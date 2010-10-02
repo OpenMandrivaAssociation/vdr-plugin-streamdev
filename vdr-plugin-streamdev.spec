@@ -3,7 +3,7 @@
 %define name	vdr-plugin-%plugin
 %define version	0.5.0
 %define cvsrev	0
-%define rel	2
+%define rel	3
 
 %if %cvsrev
 %define release	%mkrel 0.pre.%cvsrev.%rel
@@ -45,8 +45,6 @@ with the PlugIn source, but appear as separate PlugIns to VDR.
 Summary:	VDR plugin: VDR Streaming Server
 Group:		Video
 Requires:	vdr-abi = %vdr_abi
-Requires:	%plugin-common >= %version-%release
-Requires(post):	%plugin-common >= %version-%release
 
 %description server
 This PlugIn is a VDR implementation of the VTP (Video Transfer Protocol,
@@ -63,8 +61,6 @@ WinAMP, you can also listen to radio channels over a HTTP connection.
 Summary:	VDR plugin: VTP Streaming Client
 Group:		Video
 Requires:	vdr-abi = %vdr_abi
-Requires:	%plugin-common >= %version-%release
-Requires(post):	%plugin-common >= %version-%release
 
 %description client
 This PlugIn is a VDR implementation of the VTP (Video Transfer Protocol,
