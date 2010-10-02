@@ -3,7 +3,7 @@
 %define name	vdr-plugin-%plugin
 %define version	0.5.0
 %define cvsrev	0
-%define rel	3
+%define rel	4
 
 %if %cvsrev
 %define release	%mkrel 0.pre.%cvsrev.%rel
@@ -89,6 +89,7 @@ cd ..
 perl -pi -e 's/^CFLAGS =/MOREFLAGS =/' libdvbmpeg/Makefile
 sed -i 's/$(CFLAGS)/$(MOREFLAGS) $(CFLAGS)/' libdvbmpeg/Makefile
 
+cd server
 %vdr_plugin_params_begin %plugin-server
 # Credentials for HTTP authentication, in format "LOGIN:PASSWORD".
 # Credentials are required when connecting from a host not listed in
@@ -100,6 +101,7 @@ param=--auth=AUTH
 var=REMUXER
 param=--remux=REMUXER
 %vdr_plugin_params_end
+cd ..
 
 cat > README.0.5.0-1.upgrade.urpmi <<EOF
 The config file location of streamdev has changed from
