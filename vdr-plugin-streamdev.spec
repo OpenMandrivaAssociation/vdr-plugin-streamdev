@@ -3,7 +3,7 @@
 %define name	vdr-plugin-%plugin
 %define version	0.5.0
 %define cvsrev	0
-%define rel	4
+%define rel	5
 
 %if %cvsrev
 %define release	%mkrel 0.pre.%cvsrev.%rel
@@ -31,7 +31,6 @@ Patch0:		streamdev-cvs100210-ReplaceRecordingStreaming.patch
 Patch1:		streamdev-cvs221109-AddCallbackMsg.diff
 Patch2:		streamdev-cvs221109-AddFemonV1.diff
 
-BuildRoot:	%{_tmppath}/%{name}-buildroot
 BuildRequires:	vdr-devel >= 1.6.0
 
 %description
@@ -124,23 +123,23 @@ cd ../client
 %vdr_plugin_install
 cd ..
 
-install -d -m755 %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}-server
-install -m755 %plugin-server/externremux.sh %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}-server
-install -m644 %plugin-server/streamdevhosts.conf %{buildroot}%{_vdr_plugin_cfgdir}/%{plugin}-server
+install -d -m755 %{buildroot}%{vdr_plugin_cfgdir}/%{plugin}-server
+install -m755 %plugin-server/externremux.sh %{buildroot}%{vdr_plugin_cfgdir}/%{plugin}-server
+install -m644 %plugin-server/streamdevhosts.conf %{buildroot}%{vdr_plugin_cfgdir}/%{plugin}-server
 
 %clean
 rm -rf %{buildroot}
 
 %pre server
-if [ $1 = 2 ] && ! [ -e %{_vdr_plugin_cfgdir}/%{plugin}-server ] && [ -e %{_vdr_plugin_cfgdir}/%{plugin} ]; then
-	mkdir -p %{_vdr_plugin_cfgdir}/%{plugin}-server
-	touch %{_vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
+if [ $1 = 2 ] && ! [ -e %{vdr_plugin_cfgdir}/%{plugin}-server ] && [ -e %{vdr_plugin_cfgdir}/%{plugin} ]; then
+	mkdir -p %{vdr_plugin_cfgdir}/%{plugin}-server
+	touch %{vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
 fi
 
 %post server
-if [ $1 = 2 ] && [ -e %{_vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration ]; then
-	mv -vf %{_vdr_plugin_cfgdir}/%{plugin}/streamdevhosts.conf %{_vdr_plugin_cfgdir}/%{plugin}-server/streamdevhosts.conf
-	rm -f %{_vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
+if [ $1 = 2 ] && [ -e %{vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration ]; then
+	mv -vf %{vdr_plugin_cfgdir}/%{plugin}/streamdevhosts.conf %{vdr_plugin_cfgdir}/%{plugin}-server/streamdevhosts.conf
+	rm -f %{vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
 fi
 %vdr_plugin_post %plugin-server
 
@@ -156,10 +155,163 @@ fi
 %files server -f server/streamdev-server.vdr
 %defattr(-,root,root)
 %doc README HISTORY CONTRIBUTORS PROTOCOL README.*.upgrade.urpmi
-%dir %{_vdr_plugin_cfgdir}/%plugin-server
-%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin-server/streamdevhosts.conf
-%config(noreplace) %{_vdr_plugin_cfgdir}/%plugin-server/externremux.sh
+%dir %{vdr_plugin_cfgdir}/%plugin-server
+%config(noreplace) %{vdr_plugin_cfgdir}/%plugin-server/streamdevhosts.conf
+%config(noreplace) %{vdr_plugin_cfgdir}/%plugin-server/externremux.sh
 
 %files client -f client/streamdev-client.vdr
 %defattr(-,root,root)
 %doc README HISTORY CONTRIBUTORS
+
+
+%changelog
+* Sat Oct 02 2010 Anssi Hannula <anssi@mandriva.org> 0.5.0-4mdv2011.0
++ Revision: 582551
+- restore configuration files of server package
+
+* Sat Oct 02 2010 Anssi Hannula <anssi@mandriva.org> 0.5.0-3mdv2011.0
++ Revision: 582530
+- remove dependencies on removed common subpackage
+
+* Sun Aug 15 2010 Anssi Hannula <anssi@mandriva.org> 0.5.0-2mdv2011.0
++ Revision: 570212
+- new stable version 0.5.0
+  o config file location has changed
+    (streamdevhosts.conf is automatically moved)
+  o externremux.sh semantics have changed (see documentation)
+- rediff xbmc recording streaming patch
+- drop streamdev-common package, it is no longer needed
+
+* Sun Feb 14 2010 Anssi Hannula <anssi@mandriva.org> 0.5.0-0.pre.20100214.1mdv2011.0
++ Revision: 505943
+- new snapshot
+- add patches from XBMC:
+  o send messages to streamdev client (AddCallbackMsg.diff)
+  o improve recording streaming (ReplaceRecordingStreaming.patch)
+  o add femon support (AddFemonV1.diff)
+
+* Sat Jan 16 2010 Anssi Hannula <anssi@mandriva.org> 0.5.0-0.pre.20100116.1mdv2010.1
++ Revision: 492513
+- new snapshot
+- drop format-string.patch (applied upstream)
+
+* Tue Jul 28 2009 Anssi Hannula <anssi@mandriva.org> 0.3.4-1.20090715.2mdv2010.0
++ Revision: 401088
+- rebuild for new VDR
+
+* Wed Jul 15 2009 Anssi Hannula <anssi@mandriva.org> 0.3.4-1.20090715.1mdv2010.0
++ Revision: 396120
+- new snapshot
+- drop intcam.patch, remuxpatch.diff, TS-default.patch, applied upstream
+- update format-string.patch
+- update sysconfig file
+
+* Sat Mar 21 2009 Anssi Hannula <anssi@mandriva.org> 0.3.4-1.20080425.4mdv2009.1
++ Revision: 359782
+- fix format strings (format-string.patch)
+- rebuild for new vdr
+
+* Sun Sep 07 2008 Anssi Hannula <anssi@mandriva.org> 0.3.4-1.20080425.3mdv2009.0
++ Revision: 282129
+- fix externremux.sh permissions (reported by Mikko Kuivaniemi)
+
+* Mon Apr 28 2008 Anssi Hannula <anssi@mandriva.org> 0.3.4-1.20080425.2mdv2009.0
++ Revision: 197885
+- replace configdir patch with one from upstream (P1)
+- handle remote CA correctly (P2)
+
+* Sat Apr 26 2008 Anssi Hannula <anssi@mandriva.org> 0.3.4-1.20080425.1mdv2009.0
++ Revision: 197726
+- new snapshot
+- fix non-threadsafe configdir call (P1)
+- create streamdev-common package for shared translations
+- add urpmi readme file regarding config directory change
+- ship externremux.sh
+
+* Sun Mar 02 2008 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.080302.1mdv2008.1
++ Revision: 177717
+- new snapshot
+
+* Fri Jan 04 2008 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.071028.3mdv2008.1
++ Revision: 145205
+- rebuild for new vdr
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+* Mon Oct 29 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.071028.2mdv2008.1
++ Revision: 103215
+- rebuild for new vdr
+
+* Sun Oct 28 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.071028.1mdv2008.1
++ Revision: 102880
+- use TS by default for HTTP streaming (P0)
+- new snapshot
+- update URL
+
+* Sun Jul 08 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.070611.4mdv2008.0
++ Revision: 50049
+- rebuild for new vdr
+
+* Fri Jun 22 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.070611.3mdv2008.0
++ Revision: 42695
+- rebuild due to buildsystem failure
+- rebuild for new vdr
+
+* Sun Jun 10 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.070611.1mdv2008.0
++ Revision: 37966
+- new snapshot
+- drop the patch, applied upstream
+
+* Sat May 05 2007 Anssi Hannula <anssi@mandriva.org> 1.070420.2mdv2008.0-current
++ Revision: 22698
+- rebuild for new vdr
+
+* Fri Apr 20 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.070420.1mdv2008.0
++ Revision: 16291
+- new snapshot
+- patch0: section_filters-0.5.patch by Petri Hintukainen and Rolf Ahrenberg
+  (lots of changes, see README.patch for details)
+- drop patch2, obsoleted by patch0
+
+
+* Mon Feb 05 2007 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.070205.1mdv2007.0
++ Revision: 116379
+- new snapshot
+
+* Tue Dec 05 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.060823.4mdv2007.1
++ Revision: 90974
+- rebuild for new vdr
+
+* Tue Oct 31 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.060823.3mdv2007.1
++ Revision: 74085
+- rebuild for new vdr
+- Import vdr-plugin-streamdev
+
+* Thu Sep 07 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-1.060823.2mdv2007.0
+- rebuild for new vdr
+- use 2-digit year in cvsrev to shorten the rpm name length
+
+* Thu Aug 24 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-0.20060823.1mdv2007.0
+- new snapshot
+- stricter abi requires
+- drop patch1, upstream
+- rediff patch2
+- fix replaces in %%prep
+
+* Mon Aug 07 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-0.20060507.4mdv2007.0
+- rebuild for new vdr
+
+* Wed Jul 26 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-0.20060507.3mdv2007.0
+- rebuild for new vdr
+
+* Tue Jun 20 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-0.20060507.2mdv2007.0
+- use _ prefix for system path macros
+- rpmbuildupdate friendly
+
+* Sat Jun 10 2006 Anssi Hannula <anssi@mandriva.org> 0.3.3-0.20060507.1mdv2007.0
+- initial Mandriva release
+
