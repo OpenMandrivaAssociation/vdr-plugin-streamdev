@@ -1,7 +1,5 @@
 
 %define plugin	streamdev
-%define name	vdr-plugin-%plugin
-%define version	0.5.0
 %define cvsrev	0
 %define rel	5
 
@@ -12,8 +10,8 @@
 %endif
 
 Summary:	VDR plugin: streamdev
-Name:		%name
-Version:	%version
+Name:		vdr-plugin-%plugin
+Version:	0.5.0
 Release:	%release
 Group:		Video
 License:	GPL
@@ -116,7 +114,6 @@ EOF
 %vdr_plugin_build
 
 %install
-rm -rf %{buildroot}
 cd server
 %vdr_plugin_install
 cd ../client
@@ -141,26 +138,14 @@ if [ $1 = 2 ] && [ -e %{vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration ];
 	mv -vf %{vdr_plugin_cfgdir}/%{plugin}/streamdevhosts.conf %{vdr_plugin_cfgdir}/%{plugin}-server/streamdevhosts.conf
 	rm -f %{vdr_plugin_cfgdir}/%{plugin}-server/mdv-050-migration
 fi
-%vdr_plugin_post %plugin-server
-
-%postun server
-%vdr_plugin_postun %plugin-server
-
-%post client
-%vdr_plugin_post %plugin-client
-
-%postun client
-%vdr_plugin_postun %plugin-client
 
 %files server -f server/streamdev-server.vdr
-%defattr(-,root,root)
 %doc README HISTORY CONTRIBUTORS PROTOCOL README.*.upgrade.urpmi
 %dir %{vdr_plugin_cfgdir}/%plugin-server
 %config(noreplace) %{vdr_plugin_cfgdir}/%plugin-server/streamdevhosts.conf
 %config(noreplace) %{vdr_plugin_cfgdir}/%plugin-server/externremux.sh
 
 %files client -f client/streamdev-client.vdr
-%defattr(-,root,root)
 %doc README HISTORY CONTRIBUTORS
 
 
