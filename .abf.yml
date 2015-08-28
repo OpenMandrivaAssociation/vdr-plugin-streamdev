@@ -1,2 +1,4 @@
+removed_sources:
+  vdr-streamdev-0.5.0.tgz: f5e136565787f8e8a81e0eafcb575d7a0764160c
 sources:
-  "vdr-streamdev-0.5.0.tgz": f5e136565787f8e8a81e0eafcb575d7a0764160c
+  vdr-streamdev-0.6.0.tgz: ff340b3a313b9ee8b3756860118aa8653c817d1c
