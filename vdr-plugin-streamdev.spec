@@ -72,7 +72,7 @@ installation without any DVB-Hardware including EPG-Handling.
 %else
 %setup -q -n %plugin-%{version}
 %endif
-%apply_patches
+%autopatch -p1
 cd server
 %vdr_plugin_prep
 cd ../client
