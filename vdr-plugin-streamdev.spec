@@ -12,7 +12,7 @@ Release:	1
 Group:		Video
 # Several .c files cause GPLv2+, others are GPL+
 License:	GPLv2+
-URL:		http://streamdev.vdr-developer.org/
+URL:		https://streamdev.vdr-developer.org/
 
 %if %snap
 # git://projects.vdr-developer.org/vdr-plugin-streamdev.git
